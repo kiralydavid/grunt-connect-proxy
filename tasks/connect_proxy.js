@@ -17,7 +17,7 @@ module.exports = function(grunt) {
     var proxyOption;
     var proxyOptions = [];
     var validateProxyConfig = function(proxyOption) {
-        if (_.isUndefined(proxyOption.host) || _.isUndefined(proxyOption.context)) {
+        if (_.isUndefined(proxyOption.host) || ( _.isUndefined(proxyOption.context) && _.isUndefined(proxyOption.contextMatcher) )) {
             grunt.log.error('Proxy missing host or context configuration');
             return false;
         }
@@ -50,6 +50,7 @@ module.exports = function(grunt) {
         });
         if (validateProxyConfig(proxyOption)) {
             proxyOption.rules = utils.processRewrites(proxyOption.rewrite);
+            proxyOption.contextMatcher = proxyOption.contextMatcher || utils.matchContext;
             utils.registerProxy({
                 server: httpProxy.createProxyServer({
                     target: utils.getTargetUrl(proxyOption),

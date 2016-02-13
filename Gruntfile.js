@@ -92,6 +92,12 @@ module.exports = function(grunt) {
                 '^(/)rewrite': function(match, p1) {
                   return p1;
                 }
+            },
+            {
+              host: 'www.defaults.com',
+              contextMatcher: function(url) {
+                var parts = url.split('/');
+                return (parts[1] === 'api' && parts[2] !== 'user');
               }
             }
       ],

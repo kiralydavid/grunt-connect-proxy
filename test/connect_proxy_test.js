@@ -47,7 +47,7 @@ exports.connect_proxy = {
     test.expect(11);
     var proxies = utils.proxies();
 
-    test.equal(proxies.length, 6, 'should return five valid proxies');
+    test.equal(proxies.length, 6, 'should return six valid proxies');
     test.notEqual(proxies[1].server, null, 'server should be configured');
     test.equal(proxies[1].config.context, '/full', 'should have context set from config');
     test.equal(proxies[1].config.host, 'www.full.com', 'should have host set from config');
@@ -92,7 +92,7 @@ exports.connect_proxy = {
 
     test.done();
   },
-
+  
   function_rewrite: function(test) {
     test.expect(1);
     console.log(utils.proxies());
@@ -101,4 +101,28 @@ exports.connect_proxy = {
     test.equal('/rewrite'.replace(rules.from, rules.to), '/', 'should execute function when replacing');
     test.done();
   },
+
+  default_matcher: function(test) {
+    test.expect(4);
+    var proxies = utils.proxies();
+
+    var firstProxyConfig = proxies[0].config;
+    test.notEqual(firstProxyConfig.contextMatcher, null, 'every proxy should have a default contextMatcher');
+    test.equal(firstProxyConfig.contextMatcher( '/api/user', '/api/user' ), true, 'default matcher should match the context, when string');
+    test.equal(firstProxyConfig.contextMatcher( '/api/user', ['/api', '/other'] ), true, 'default matcher should match the context, when array');
+    test.equal(firstProxyConfig.contextMatcher( '/other/call', ['/api', '/other'] ), true, 'default matcher should match the context, when array');
+
+    test.done();
+  },
+
+  custom_matcher: function(test) {
+    test.expect(3);
+    var proxies = utils.proxies();
+
+    test.equal(proxies[5].config.contextMatcher('/api/file'), true, 'custom matcher should match any /api call, except /api/user');
+    test.equal(proxies[5].config.contextMatcher('/api/storage'), true, 'custom matcher should match any /api call, except /api/user');
+    test.equal(proxies[5].config.contextMatcher('/api/user'), false, 'custom matcher should not match /api/user');
+
+    test.done();
+  }
 };
